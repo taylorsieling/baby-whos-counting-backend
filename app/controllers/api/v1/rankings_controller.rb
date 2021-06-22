@@ -1,4 +1,4 @@
-class RankingsController < ApplicationController
+class Api::V1::RankingsController < ApplicationController
 
     before_action :set_ranking, only: [:show, :update, :destroy]
   
