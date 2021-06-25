@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       resources :rankings
       resources :songs
       resources :users
+      resources :albums
     end
   end
 
