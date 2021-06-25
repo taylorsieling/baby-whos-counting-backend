@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_22_172622) do
+ActiveRecord::Schema.define(version: 2021_06_25_212019) do
+
+  create_table "albums", force: :cascade do |t|
+    t.string "title"
+    t.string "release_year"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "rankings", force: :cascade do |t|
     t.float "score"
@@ -24,10 +31,11 @@ ActiveRecord::Schema.define(version: 2021_06_22_172622) do
 
   create_table "songs", force: :cascade do |t|
     t.string "title"
-    t.string "album"
-    t.string "release_year"
+    t.string "length"
+    t.integer "album_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["album_id"], name: "index_songs_on_album_id"
   end
 
   create_table "users", force: :cascade do |t|
