@@ -1,12 +1,12 @@
 class Api::V1::AuthController < ApplicationController
 
-    skip_before_action :authorized, only: [:spotify_request]
+    # skip_before_action :authorized, only: [:spotify_request]
   
     def spotify_request
       # User has clicked "login" button - assemble GET request to Spotify to have
       # User authorizes application
       query_params = {
-        client_id: ENV['CLIENT_ID'],
+        client_id: ENV["CLIENT_ID"],
         response_type: "code",
         redirect_uri: ENV['REDIRECT_URI'],
         scope: "user-top-read playlist-modify-public playlist-modify-private user-read-email user-read-private",
