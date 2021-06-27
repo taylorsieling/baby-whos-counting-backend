@@ -39,10 +39,13 @@ ActiveRecord::Schema.define(version: 2021_06_25_212019) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "first_name"
-    t.string "last_name"
-    t.string "email"
-    t.string "password_digest"
+    t.string "username"
+    t.string "access_token"
+    t.string "refresh_token"
+    t.string "spotify_url"
+    t.string "profile_img_url"
+    t.string "href"
+    t.string "uri"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
