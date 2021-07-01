@@ -1,12 +1,10 @@
 Rails.application.routes.draw do
-  resources :albums
+
   namespace :api do
     namespace :v1 do
 
       get "/login", to: "auth#spotify_request"
-      get "/auth", to: "auth#show"
-      get '/user', to: "users#create"
-      patch '/user', to: "users#update"
+      post "/user", to: "users#create"
 
       resources :rankings
       resources :songs
