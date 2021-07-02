@@ -16,48 +16,17 @@ class Api::V1::UsersController < ApplicationController
     # POST /users
     def create
 
-      # Request Access Tokens
-      body = {
-        grant_type: "authorization_code",
-        code: params[:code],
-        redirect_uri: ENV['REDIRECT_URI'],
-        client_id: ENV['CLIENT_ID'],
-        client_secret: ENV["CLIENT_SECRET"]
-      }
+      auth_params = SpotifyApiAdapter.login(params[:code])
+      user_data = SpotifyApiAdapter.getUserData(auth_params["access_token"])
+      @user = User.find_or_create_by(user_params(user_data))
+      img_url = user_data["images"][0] ? user_data["images"][0]["url"] : nil
+      encodedAccess = issue_token({token: auth_params["access_token"]})
+      encodedRefresh = issue_token({token: auth_params["refresh_token"]})
 
-      auth_response = RestClient.post('https://accounts.spotify.com/api/token', body)
-      auth_params = JSON.parse(auth_response.body)
-
-      # Request User Profile Information
       
-      header = {
-        Authorization: "Bearer #{auth_params["access_token"]}"
-      }
-
-      user_response = RestClient.get("https://api.spotify.com/v1/me", header)
-      user_params = JSON.parse(user_response.body)
-
-      @user = User.find_or_create_by(
-        username: user_params["display_name"],
-        spotify_url: user_params["external_urls"]["spotify"],
-        href: user_params["href"],
-        uri: user_params["uri"]
-        )
-
-      image = user_params["images"][0] ? user_params["images"][0]["url"] : nil
-      @user.update(profile_img_url: image)
-
-      if @user.access_token_expired?
-        @user.refresh_access_token
-      else
-        @user.update(
-          access_token: auth_params["access_token"], 
-          refresh_token: auth_params["refresh_token"]
-        )
-      end
-
-      redirect_to "http://localhost:3000/dashboard"
+      @user.update(profile_img_url: img_url,access_token: encodedAccess,refresh_token: encodedRefresh)
       
+      render json: @user.to_json(:except => [:access_token, :refresh_token, :created_at, :updated_at])
 
     end
   
@@ -84,8 +53,13 @@ class Api::V1::UsersController < ApplicationController
       # end
   
       # Only allow a list of trusted parameters through.
-      def user_params 
-        params.require(:user).permit(:username, :access_token, :refresh_token, :spotify_url, :profile_img_url, :href, :uri)
+    def user_params(user_data)
+      params = {
+        username: user_data["display_name"],
+        spotify_id: user_data["id"],
+        spotify_url: user_data["external_urls"]["spotify"],
+        email: user_data["email"]
+      }
     end
 
 end
